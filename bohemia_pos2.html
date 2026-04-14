@@ -45,29 +45,29 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 .bsm:hover{border-color:var(--gold);color:var(--gold);}
 .zoom-tv-btn{background:rgba(0,0,0,.5);border:1px solid var(--bo);color:var(--cream);padding:2px 6px;border-radius:4px;font-size:10px;cursor:pointer;margin-left:3px;}
 
-/* Cajero layout */
+/* Cajero layout - ajustes compactos */
 #caj{display:none;flex-direction:column;height:100vh;}
 .caj-body{display:grid;grid-template-columns:1fr 265px;flex:1;overflow:hidden;}
 @media(max-width:680px){
   .caj-body{grid-template-columns:1fr;}
   .caj-right{position:fixed;bottom:0;left:0;right:0;max-height:40vh;background:var(--d2);border-top:2px solid var(--gold);border-radius:12px 12px 0 0;padding:6px;z-index:20;overflow-y:auto;}
-  .caj-left{padding-bottom:42vh;}
+  .caj-left{padding-bottom:35vh;} /* reducido para que no tape tanto */
 }
 .caj-left{padding:6px;overflow-y:auto;}
 .caj-right{background:var(--d2);border-left:1px solid var(--bo);padding:6px;display:flex;flex-direction:column;gap:4px;}
-.cats{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.cats{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;} /* menos espacio */
 .cat{font-size:9px;padding:3px 10px;border-radius:16px;border:1px solid var(--bo);background:transparent;color:var(--mu);cursor:pointer;transition:all .15s;}
 .cat.on{background:var(--gold);color:#000;font-weight:700;}
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:4px;}
-.mitem{background:var(--d3);border:1px solid var(--bo);border-radius:8px;padding:6px 4px;text-align:center;cursor:pointer;transition:border-color .15s;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:3px;} /* más compacto */
+.mitem{background:var(--d3);border:1px solid var(--bo);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;transition:border-color .15s;}
 .mitem:hover{border-color:var(--gold);}
-.mn{font-size:9px;font-weight:500;line-height:1.2;}
-.mp{font-size:10px;color:var(--gold);font-weight:700;}
+.mn{font-size:8px;font-weight:500;line-height:1.2;}
+.mp{font-size:8px;color:var(--gold);font-weight:700;} /* reducido de 10px a 8px (≈2pt menos) */
 .mt{font-size:7px;color:var(--mu);}
 .cbox{background:var(--dark);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:3px;border:1px solid var(--bo);}
 .lbl{font-size:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;}
 .cbox input,.cbox select,.cbox textarea{background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;width:100%;}
-.oit{flex:1;overflow-y:auto;max-height:120px;}
+.oit{flex:1;overflow-y:auto;max-height:100px;} /* reducido de 120px a 100px */
 .orow{display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--bo);font-size:9px;}
 .qc{display:flex;gap:2px;}
 .qb{width:18px;height:18px;font-size:12px;cursor:pointer;background:var(--d4);border:1px solid var(--bo);color:var(--cream);border-radius:3px;}
@@ -112,7 +112,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 .tvbar{height:4px;margin-top:5px;background:var(--d4);border-radius:2px;overflow:hidden;}
 .tvbarfill{height:100%;border-radius:2px;}
 
-/* ========== SALÓN TV CON REPRODUCTOR MULTIMEDIA ========== */
+/* Salón TV con multimedia */
 #salon{display:none;flex-direction:row;height:100vh;width:100vw;overflow:hidden;background:#000;}
 .salon-left{flex:1;min-width:0;position:relative;background:#000;display:flex;flex-direction:column;align-items:stretch;}
 .video-container{width:100%;flex:1;background:#000;display:flex;flex-direction:column;position:relative;}
@@ -215,7 +215,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
     <div class="caj-left">
       <div class="cats" id="cats"></div>
       <div class="mgrid" id="mgrid"></div>
-      <div style="font-size:10px;margin:8px 0 4px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;">Pedidos activos</div>
+      <div style="font-size:10px;margin:4px 0 4px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;">Pedidos activos</div>
       <div class="cola-grid" id="cola-d"></div>
     </div>
     <div class="caj-right">
@@ -258,7 +258,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   <div class="tv-body"><div class="tv-grid" id="tv-grid"></div></div>
 </div>
 
-<!-- ========== SALÓN TV CON REPRODUCTOR MULTIMEDIA REAL ========== -->
+<!-- Salón TV con multimedia -->
 <div id="salon">
   <div class="salon-left" id="salon-left">
     <div class="video-container">
@@ -498,7 +498,7 @@ const DEFAULT_MENU = {
 };
 let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 
-// ========== FUNCIONES DEL REPRODUCTOR MULTIMEDIA (Salón) ==========
+// ========== FUNCIONES DEL REPRODUCTOR MULTIMEDIA (Salón) CON DETENCIÓN AUTOMÁTICA ==========
 function initSalonVideo() {
   const videoEl = document.getElementById('videoPlayer');
   const youtubeDiv = document.getElementById('youtubePlayer');
@@ -510,18 +510,28 @@ function initSalonVideo() {
   const btnHDMI = document.getElementById('btnHDMI');
   const btnNetflix = document.getElementById('btnNetflix');
 
-  function showNativeVideo() {
-    youtubeDiv.style.display = 'none';
-    videoEl.style.display = 'block';
+  // Función para detener TODO (YouTube y video local)
+  function detenerTodo() {
+    // Detener video nativo
     videoEl.pause();
-  }
-  function showYouTube() {
-    videoEl.style.display = 'none';
-    youtubeDiv.style.display = 'block';
-    videoEl.pause();
+    videoEl.src = "";
+    videoEl.load();
+    // Destruir YouTube por completo
+    youtubeDiv.innerHTML = "";
+    youtubeDiv.style.display = "none";
+    videoEl.style.display = "block";
   }
 
-  function loadYouTube(url) {
+  // Mostrar solo video nativo (limpio)
+  function mostrarVideoNativo() {
+    detenerTodo();
+    videoEl.style.display = "block";
+    youtubeDiv.style.display = "none";
+  }
+
+  // Cargar YouTube (destruye todo antes)
+  function cargarYouTube(url) {
+    detenerTodo();
     let videoId = '';
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
@@ -533,9 +543,11 @@ function initSalonVideo() {
     }
     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`;
     youtubeDiv.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%; height:100%;"></iframe>`;
-    showYouTube();
+    videoEl.style.display = "none";
+    youtubeDiv.style.display = "block";
   }
 
+  // Eventos
   btnYoutube.addEventListener('click', () => {
     let url = youtubeUrlInput.value.trim();
     if (!url) {
@@ -543,10 +555,10 @@ function initSalonVideo() {
       if(url) youtubeUrlInput.value = url;
       else return;
     }
-    loadYouTube(url);
+    cargarYouTube(url);
   });
   cargarYoutube.addEventListener('click', () => {
-    if(youtubeUrlInput.value.trim()) loadYouTube(youtubeUrlInput.value.trim());
+    if(youtubeUrlInput.value.trim()) cargarYouTube(youtubeUrlInput.value.trim());
     else toast('Escribe una URL de YouTube primero');
   });
   btnLocal.addEventListener('click', () => {
@@ -555,46 +567,37 @@ function initSalonVideo() {
   localFileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if(file && file.type.startsWith('video/')) {
+      detenerTodo();  // Para YouTube y limpia video anterior
       const url = URL.createObjectURL(file);
       videoEl.src = url;
       videoEl.load();
       videoEl.play();
-      showNativeVideo();
+      videoEl.style.display = "block";
+      youtubeDiv.style.display = "none";
       toast(`Reproduciendo: ${file.name}`);
     } else {
       toast('Selecciona un archivo de video válido');
     }
   });
-
-  // HDMI: muestra instrucciones en pantalla
   btnHDMI.addEventListener('click', () => {
+    detenerTodo();  // Detiene cualquier reproducción
     toast('🔌 Usa el control remoto de tu Smart TV para cambiar a la entrada HDMI deseada.');
-    // También podríamos mostrar un modal, pero con un toast es suficiente
   });
-
-  // Netflix: intenta abrir la app nativa o el sitio web
   btnNetflix.addEventListener('click', () => {
-    // Intentar abrir Netflix con esquema de URL específico de Android TV / Smart TV
-    // Si falla, abre la web.
+    detenerTodo();  // Detiene todo antes de abrir Netflix
     const netflixIntent = 'netflix://';
     const netflixWeb = 'https://www.netflix.com';
-    // Primero intentar con el esquema personalizado (funciona en muchos Smart TV)
     window.location.href = netflixIntent;
-    // Si no responde en 1 segundo, redirigir a la web (por si acaso)
     setTimeout(() => {
       window.open(netflixWeb, '_blank');
     }, 1000);
   });
 
-  // Mostrar video nativo por defecto (sin fuente, solo controles)
-  showNativeVideo();
-  videoEl.poster = '';
-  videoEl.controls = true;
-  videoEl.autoplay = false;
-  videoEl.muted = false;
+  // Estado inicial: video nativo sin fuente
+  mostrarVideoNativo();
 }
 
-// ========== FUNCIONES ORIGINALES DEL POS (sin cambios relevantes) ==========
+// ========== FUNCIONES ORIGINALES DEL POS (sin cambios) ==========
 function toast(msg) {
   let t = document.createElement("div"); t.className="toast"; t.textContent=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),2200);
