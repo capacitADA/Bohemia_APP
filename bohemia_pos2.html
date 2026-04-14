@@ -112,10 +112,10 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 .tvbar{height:4px;margin-top:5px;background:var(--d4);border-radius:2px;overflow:hidden;}
 .tvbarfill{height:100%;border-radius:2px;}
 
-/* ========== NUEVO MODO SALÓN ========== */
+/* ========== NUEVO MODO SALÓN (adaptado a WhaleOS) ========== */
 #salon{display:none;position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
 
-/* Video de fondo (HDMI o YouTube) */
+/* Video de fondo: solo se usa si el navegador soporta ext:// */
 .salon-background-video {
   position: absolute;
   top: 0;
@@ -138,7 +138,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   background: transparent;
 }
 
-/* Área izquierda: controles multimedia (solo una barra horizontal) */
+/* Área izquierda: controles multimedia */
 .salon-controls-area {
   flex: 1;
   display: flex;
@@ -146,7 +146,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
-  pointer-events: none; /* para que los clics pasen al fondo? No, los botones deben ser clickeables */
+  pointer-events: none;
 }
 .salon-controls-bar {
   background: rgba(13,13,13,0.7);
@@ -184,7 +184,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   width: 260px;
 }
 
-/* Barra lateral (pedidos) igual que antes pero semi-transparente */
+/* Barra lateral (pedidos) semi-transparente */
 .salon-sidebar {
   width: 280px;
   min-width: 260px;
@@ -351,7 +351,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   opacity: 0.5;
 }
 
-/* Admin y estadísticas (sin cambios) */
+/* Admin y estadísticas */
 .admin-body{padding:8px;overflow-y:auto;height:calc(100vh - 44px);}
 .admin-form{background:var(--d3);padding:8px;border-radius:10px;margin-bottom:8px;border:1px solid var(--bo);}
 .admin-form h3{color:var(--gold);font-family:'Bebas Neue',sans-serif;margin-bottom:6px;}
@@ -407,7 +407,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   <div class="fb-note" id="fb-status">🔄 Conectando a Firebase...</div>
 </div>
 
-<!-- Cajero (sin cambios) -->
+<!-- Cajero -->
 <div id="caj">
   <div class="topbar">
     <div class="tb-left"><div class="tb-logo-wrap"><img src="Logo_Bohemia.png" onerror="this.parentElement.style.display='none'; document.getElementById('caj-logo-fb').style.display='flex';"></div><div class="tb-logo-fb" id="caj-logo-fb" style="display:none;">B</div><div class="tb-brand">CAJERO</div></div>
@@ -427,33 +427,32 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
   </div>
 </div>
 
-<!-- Cocina TV (sin cambios) -->
+<!-- Cocina TV -->
 <div id="coc">
   <div class="topbar"><div class="tb-left"><div class="tb-logo-wrap"><img src="Logo_Bohemia.png" onerror="this.parentElement.style.display='none';"></div><div class="tb-brand">COCINA TV</div></div><div class="tb-right"><button class="zoom-tv-btn" id="zoomMasBtn">📐+</button><button class="zoom-tv-btn" id="zoomMenosBtn">📐−</button><button class="zoom-tv-btn" id="textoMasBtn">🔤+</button><button class="zoom-tv-btn" id="textoMenosBtn">🔤−</button><span class="pill">Cloud</span><button class="bsm" onclick="goHome()">Inicio</button></div></div>
   <div class="tv-body"><div class="tv-grid" id="tv-grid"></div></div>
 </div>
 
-<!-- ========== NUEVO MODO SALÓN (con HDMI en webOS) ========== -->
+<!-- ========== NUEVO MODO SALÓN (HDMI con detección WhaleOS) ========== -->
 <div id="salon">
-  <!-- Video de fondo: se usará para HDMI (webOS) o para YouTube -->
+  <!-- Video de fondo: se usará para HDMI en webOS; en WhaleOS mostrará instrucción -->
   <video id="salonBgVideo" class="salon-background-video" autoplay muted></video>
 
   <div class="salon-ui">
     <!-- Área izquierda: controles multimedia -->
     <div class="salon-controls-area">
       <div class="salon-controls-bar">
-        <button id="btnHDMI1" class="bsm" style="background: var(--gold); color:#000;">📺 HDMI 1 (DirectTV)</button>
-        <button id="btnHDMI2" class="bsm">📺 HDMI 2</button>
+        <button id="btnHDMIAction" class="bsm" style="background: var(--gold); color:#000;">📺 Pantalla Completa + HDMI</button>
         <button id="btnYouTube" class="bsm">🎬 YouTube</button>
         <input type="text" id="youtubeUrl" placeholder="URL de YouTube">
         <button id="cargarYouTube" class="bsm">Cargar</button>
-        <button id="btnRestaurarTV" class="bsm" style="display:none;">🔙 Volver a TV</button>
+        <button id="btnRestaurarTV" class="bsm" style="display:none;">🔙 Volver a Modo TV</button>
       </div>
-      <!-- Mensaje de estado webOS -->
+      <!-- Estado del sistema -->
       <div id="webosStatus" style="margin-top: 12px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 20px; font-size: 11px; color: var(--gold); pointer-events: auto;"></div>
     </div>
 
-    <!-- Barra lateral de pedidos (idéntica a la original pero con fondo semitransparente) -->
+    <!-- Barra lateral de pedidos -->
     <div class="salon-sidebar" id="salon-sidebar">
       <div class="salon-topbar"><div><div class="salon-brand">NUEVOS PEDIDOS</div></div><div style="display:flex;align-items:center;gap:6px;"><div class="salon-clock" id="salon-clock">--:--</div><button class="bsm" onclick="goHome()" style="font-size:9px;">✕</button></div></div>
       <div class="salon-orders" id="salon-orders"><div class="salon-empty"><span class="ic-empty">🍔</span>Sin pedidos activos</div></div>
@@ -463,13 +462,35 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- Admin -->
-<div id="admin"><div class="topbar"><div class="tb-left"><div class="tb-logo-wrap"><img src="Logo_Bohemia.png" onerror="this.parentElement.style.display='none';"></div><div class="tb-brand">ADMIN MENÚ</div></div><div class="tb-right"><button class="bsm" onclick="goHome()">Inicio</button></div></div><div class="admin-body"><div class="admin-form"><h3>Gestión de Menú</h3><input type="text" id="prod-id" style="display:none;"><input type="text" id="prod-nombre" placeholder="Nombre del producto"><input type="number" id="prod-precio" placeholder="Precio COP (ej: 27000)"><select id="prod-categoria"><option>Hamburguesas</option><option>Perros Calientes</option><option>Carnes</option><option>Pinchos</option><option>Picadas</option><option>Patacones</option><option>Papitas</option><option>Bebidas</option><option>Cocteles</option><option>Cervezas</option><option>Tragos</option><option>Adicionales</option></select><label><input type="checkbox" id="prod-empaque"> Aplica empaque (llevar)</label><br><label><input type="checkbox" id="prod-sabores"> Tiene variantes/sabores</label><input type="text" id="prod-sabores-list" placeholder="Sabores separados por coma"><button onclick="guardarProducto()" style="background:var(--gold);color:#000;font-weight:700;">💾 Guardar</button><button onclick="limpiarFormProducto()" style="background:var(--d4);color:var(--cream);">Cancelar</button></div><div id="admin-lista"></div></div></div>
+<div id="admin">
+  <div class="topbar"><div class="tb-left"><div class="tb-logo-wrap"><img src="Logo_Bohemia.png" onerror="this.parentElement.style.display='none';"></div><div class="tb-brand">ADMIN MENÚ</div></div><div class="tb-right"><button class="bsm" onclick="goHome()">Inicio</button></div></div>
+  <div class="admin-body">
+    <div class="admin-form">
+      <h3>Gestión de Menú</h3>
+      <input type="text" id="prod-id" style="display:none;">
+      <input type="text" id="prod-nombre" placeholder="Nombre del producto">
+      <input type="number" id="prod-precio" placeholder="Precio COP (ej: 27000)">
+      <select id="prod-categoria">
+        <option>Hamburguesas</option><option>Perros Calientes</option><option>Carnes</option>
+        <option>Pinchos</option><option>Picadas</option><option>Patacones</option>
+        <option>Papitas</option><option>Bebidas</option><option>Cocteles</option>
+        <option>Cervezas</option><option>Tragos</option><option>Adicionales</option>
+      </select>
+      <label><input type="checkbox" id="prod-empaque"> Aplica empaque (llevar)</label><br>
+      <label><input type="checkbox" id="prod-sabores"> Tiene variantes/sabores</label>
+      <input type="text" id="prod-sabores-list" placeholder="Sabores separados por coma">
+      <button onclick="guardarProducto()" style="background:var(--gold);color:#000;font-weight:700;">💾 Guardar</button>
+      <button onclick="limpiarFormProducto()" style="background:var(--d4);color:var(--cream);">Cancelar</button>
+    </div>
+    <div id="admin-lista"></div>
+  </div>
+</div>
 
 <!-- Estadísticas -->
 <div id="stats"><div class="topbar"><div class="tb-left"><div class="tb-logo-wrap"><img src="Logo_Bohemia.png" onerror="this.parentElement.style.display='none';"></div><div class="tb-brand">ESTADÍSTICAS</div></div><div class="tb-right"><button class="bsm" onclick="goHome()">Inicio</button></div></div><div class="stats-body"><div class="stats-hdr"><div><span class="rango-label">Desde</span> <input type="date" id="stats-fecha-desde"></div><div><span class="rango-label">Hasta</span> <input type="date" id="stats-fecha-hasta"></div><button class="bxl" onclick="exportXlsx()">📎 Exportar Excel</button></div><div class="kpis" id="kpis"></div><div style="overflow-x:auto;"><table class="stbl"><thead><tr><th>Hora</th><th>Cliente</th><th>WA</th><th>Tipo</th><th>Productos</th><th>Total</th><th>Estado</th></tr></thead><tbody id="stbl-body"></tbody></table></div></div></div>
 
 <script>
-// ========== FIREBASE (sin cambios) ==========
+// ========== FIREBASE ==========
 const firebaseConfig = {
   apiKey: "AIzaSyBZS0NoGIG8EJyRuW7QKBhNG3B6oFn2KCk",
   authDomain: "bohemiaapp-aaac0.firebaseapp.com",
@@ -499,23 +520,164 @@ const EMPAQUE_PRECIO = 0;
 const TIEMPO_OBJETIVO = 15;
 const VISITAS_RECURRENTE = 4;
 
-const DEFAULT_MENU = { /* igual que antes, omito por brevedad pero se mantiene */ 
-  "Hamburguesas":[{id:"hb1",name:"Sencilla",price:20000}],
-  /* ... (se asume que está completo en tu código original; lo dejamos igual) */
+// Menú por defecto completo
+const DEFAULT_MENU = {
+  "Hamburguesas": [
+    {id:"hb1", name:"Sencilla", price:20000},
+    {id:"hb2", name:"De Pollo", price:20000},
+    {id:"hb3", name:"Bohemia Popular", price:24000},
+    {id:"hb4", name:"Pollo Crispy", price:25000},
+    {id:"hb5", name:"Bohemia Choricarne", price:27000},
+    {id:"hb6", name:"Bohemia Choripollo", price:27000},
+    {id:"hb7", name:"Doble Carne", price:27000},
+    {id:"hb8", name:"Mixta", price:27000},
+    {id:"hb9", name:"Mix Crunch", price:33000},
+    {id:"hb10", name:"De la Casa", price:33000},
+    {id:"hb11", name:"Especial", price:33000},
+    {id:"hb12", name:"Coqueta", price:33000},
+    {id:"hb13", name:"Campesina", price:35000},
+    {id:"hb14", name:"Cheddar Bacon Burguer", price:33000},
+    {id:"hb15", name:"Reto Bohemia", price:50000}
+  ],
+  "Perros Calientes": [
+    {id:"pc1", name:"Perro Sencillo", price:19000},
+    {id:"pc2", name:"Chori Perro", price:20000},
+    {id:"pc3", name:"Perro Especial", price:26000},
+    {id:"pc4", name:"Chori Perro Especial", price:27000},
+    {id:"pc5", name:"Perro Especial Crunch", price:30000},
+    {id:"pc6", name:"Perro de la Casa", price:30000},
+    {id:"pc7", name:"Perro que Locura Bohemia", price:33000}
+  ],
+  "Carnes": [
+    {id:"ca1", name:"Porción de Chatas", price:35000},
+    {id:"ca2", name:"Suprema de Carne", price:38000},
+    {id:"ca3", name:"Churrasco Bohemia", price:38000},
+    {id:"ca4", name:"Pechuga", price:28000},
+    {id:"ca5", name:"Pechuga Gratinada", price:33000},
+    {id:"ca6", name:"Suprema de Pollo", price:33000},
+    {id:"ca7", name:"Pechuga Italiana", price:35000},
+    {id:"ca8", name:"Pechuga Empanizada", price:38000},
+    {id:"ca9", name:"Especial de Carnes (Nueva)", price:45000}
+  ],
+  "Pinchos": [
+    {id:"pi1", name:"Pincho Solo Pollo", price:28000},
+    {id:"pi2", name:"Pincho Mixto Carne y Pollo", price:30000},
+    {id:"pi3", name:"Pincho Especial", price:43000}
+  ],
+  "Picadas": [
+    {id:"pk1", name:"Pequeña (1 persona)", price:37000},
+    {id:"pk2", name:"Mediana (2 personas)", price:50000},
+    {id:"pk3", name:"Grande (3 personas)", price:65000},
+    {id:"pk4", name:"Grande Bohemia (4 personas)", price:90000}
+  ],
+  "Patacones": [
+    {id:"pt1", name:"Patacón Sencillo", price:22000},
+    {id:"pt2", name:"Patacón de Pollo", price:23000},
+    {id:"pt3", name:"Patacón Especial", price:30000}
+  ],
+  "Papitas": [
+    {id:"pp1", name:"Salchi Papa", price:19000},
+    {id:"pp2", name:"Chori Papa", price:20000},
+    {id:"pp3", name:"Salchi Chori Papa", price:24000},
+    {id:"pp4", name:"Papas Especiales (1 persona)", price:30000},
+    {id:"pp5", name:"Papas Especiales (2 personas)", price:36000}
+  ],
+  "Bebidas": [
+    {id:"be1", name:"Jugo Natural", price:8000, sabores:["Mora","Fresa","Lulo","Maracuyá","Guanábana","Cerezadas","Hierba Buena","Mandarinada"]},
+    {id:"be2", name:"Granizada", price:8000, sabores:["Mora","Fresa","Lulo","Maracuyá"]},
+    {id:"be3", name:"Gaseosa", price:4000, sabores:["Coca Cola","Sprite","Manzana","Cola","Quatro","Postobón"]},
+    {id:"be4", name:"Coca Cola 3L", price:14000},
+    {id:"be5", name:"Coca Cola 1.5L", price:9000},
+    {id:"be6", name:"Postobón 3L", price:11000},
+    {id:"be7", name:"Agua", price:2000}
+  ],
+  "Cervezas": [
+    {id:"cer1", name:"Club 860", price:8000},
+    {id:"cer2", name:"Poker 1L", price:8000},
+    {id:"cer3", name:"Costena 750", price:7000},
+    {id:"cer4", name:"Águila 750", price:7000},
+    {id:"cer5", name:"Águila Light 1L", price:8000},
+    {id:"cer6", name:"Corona 750", price:7000},
+    {id:"cer7", name:"Coronita", price:6000},
+    {id:"cer8", name:"Club 330", price:6000},
+    {id:"cer9", name:"Poker 330", price:6000},
+    {id:"cer10", name:"Águila 330", price:4000},
+    {id:"cer11", name:"Stella Artois", price:6000},
+    {id:"cer12", name:"Heineken", price:9000},
+    {id:"cer13", name:"Bud Weiser", price:9000},
+    {id:"cer14", name:"Redd's", price:9000},
+    {id:"cer15", name:"Costena Bacana", price:6000},
+    {id:"cer16", name:"Cola y Pola", price:4000},
+    {id:"cer17", name:"Michelada", price:3000},
+    {id:"cer18", name:"Shock de Limón", price:1000}
+  ],
+  "Cocteles": [
+    {id:"co1", name:"Like", price:6000},
+    {id:"co2", name:"Michelada de Like", price:7000},
+    {id:"co3", name:"Smirnof", price:11000},
+    {id:"co4", name:"Michelada de Smirnof", price:13000},
+    {id:"co5", name:"Shock de Whisky", price:8000},
+    {id:"co6", name:"Shock de Aguardiente", price:6000}
+  ],
+  "Tragos": [
+    {id:"tr1", name:"Wiski Botella 750", price:70000},
+    {id:"tr2", name:"Tequila 350", price:60000},
+    {id:"tr3", name:"Tequila 700", price:80000},
+    {id:"tr4", name:"Aguardiente Botella", price:35000},
+    {id:"tr5", name:"Aguardiente 750 Ant.", price:60000}
+  ],
+  "Adicionales": [
+    {id:"ad1", name:"Jamón y Queso", price:5000},
+    {id:"ad2", name:"Porción Papa Francesa Peq.", price:10000},
+    {id:"ad3", name:"Doble Porción Tocineta", price:5000},
+    {id:"ad4", name:"Adicional Chorizo", price:9000},
+    {id:"ad5", name:"Adicional Salchicha", price:9000},
+    {id:"ad6", name:"Porción Carne Hamburguesa", price:10000},
+    {id:"ad7", name:"Adicional Pechuga", price:13000}
+  ]
 };
-// Por brevedad, aquí pondré solo un ejemplo; en tu implementación original está completo.
-// En el código final debes mantener el DEFAULT_MENU original. Yo lo resumiré para que el mensaje no sea enorme.
 let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 
-// ========== FUNCIONES ORIGINALES DEL POS (se mantienen igual, sin cambios) ==========
+// ========== FUNCIONES DEL POS (sin cambios en lógica) ==========
 function toast(msg) { let t = document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2200); }
 function playBeep() { try { const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.type = 'sine'; osc.frequency.value = 880; gain.gain.setValueAtTime(.5, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .3); osc.start(ctx.currentTime); osc.stop(ctx.currentTime + .3); } catch(e) {} }
 function persist(key, data) { db.ref("pedidos/"+key).set(data); }
 function persistField(key, field, val) { db.ref("pedidos/"+key+"/"+field).set(val); }
 function normalizeWA(wa) { let n = wa.replace(/\D/g,""); if(n.length===10) n="57"+n; return n; }
 
-function buildMenu() { /* igual */ let catsDiv = document.getElementById("cats"); catsDiv.innerHTML = ""; Object.keys(MENU).forEach(c => { let btn = document.createElement("button"); btn.className = "cat"+(c===catActual?" on":""); btn.textContent = c; btn.onclick = () => { catActual=c; document.querySelectorAll(".cat").forEach(x=>x.classList.remove("on")); btn.classList.add("on"); renderItems(); }; catsDiv.appendChild(btn); }); renderItems(); }
-function renderItems() { let grid = document.getElementById("mgrid"); if(!grid) return; grid.innerHTML = ""; let items = MENU[catActual] || []; items.forEach(item => { if(item.sabores && item.sabores.length) { item.sabores.forEach(sabor => { let div = document.createElement("div"); div.className = "mitem"; div.innerHTML = `<div class="mn">${item.name}<br><small style="color:var(--mu)">${sabor}</small></div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`; div.onclick = () => addToOrder({...item, name:`${item.name} ${sabor}`, id:item.id+"_"+sabor, categoria:catActual}); grid.appendChild(div); }); } else { let div = document.createElement("div"); div.className = "mitem"; div.innerHTML = `<div class="mn">${item.name}</div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`; div.onclick = () => addToOrder({...item, categoria:catActual}); grid.appendChild(div); } }); }
+// Funciones de menú y productos (CORREGIDAS)
+function buildMenu() {
+  let catsDiv = document.getElementById("cats"); if(!catsDiv) return;
+  catsDiv.innerHTML = "";
+  Object.keys(MENU).forEach(c => {
+    let btn = document.createElement("button");
+    btn.className = "cat"+(c===catActual?" on":"");
+    btn.textContent = c;
+    btn.onclick = () => { catActual=c; document.querySelectorAll(".cat").forEach(x=>x.classList.remove("on")); btn.classList.add("on"); renderItems(); };
+    catsDiv.appendChild(btn);
+  });
+  renderItems();
+}
+function renderItems() {
+  let grid = document.getElementById("mgrid"); if(!grid) return;
+  grid.innerHTML = "";
+  let items = MENU[catActual] || [];
+  items.forEach(item => {
+    if(item.sabores && item.sabores.length) {
+      item.sabores.forEach(sabor => {
+        let div = document.createElement("div"); div.className = "mitem";
+        div.innerHTML = `<div class="mn">${item.name}<br><small style="color:var(--mu)">${sabor}</small></div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`;
+        div.onclick = () => addToOrder({...item, name:`${item.name} ${sabor}`, id:item.id+"_"+sabor, categoria:catActual});
+        grid.appendChild(div);
+      });
+    } else {
+      let div = document.createElement("div"); div.className = "mitem";
+      div.innerHTML = `<div class="mn">${item.name}</div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`;
+      div.onclick = () => addToOrder({...item, categoria:catActual});
+      grid.appendChild(div);
+    }
+  });
+}
 function addToOrder(item) { let ex = orden.find(i => i.id===item.id); if(ex) ex.qty++; else orden.push({...item, qty:1}); updateOrderUI(); }
 function changeQty(id, delta) { let idx = orden.findIndex(i=>i.id===id); if(idx<0) return; orden[idx].qty += delta; if(orden[idx].qty<=0) orden.splice(idx,1); updateOrderUI(); }
 function clearOrder() { orden = []; document.getElementById("c-nombre").value=""; document.getElementById("c-wa").value=""; document.getElementById("c-obs").value=""; document.getElementById("c-mesa").value=""; document.getElementById("recur-box").style.display="none"; updateOrderUI(); }
@@ -532,14 +694,70 @@ function renderTV() { if(!suscripcionActiva) return; let grid = document.getElem
 let salonClockInterval = null;
 function startSalonClock() { const el = document.getElementById("salon-clock"); function tick() { const now = new Date(); if(el) el.textContent = now.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false}); } tick(); if(salonClockInterval) clearInterval(salonClockInterval); salonClockInterval = setInterval(tick, 10000); }
 function renderSalon() { if(!suscripcionActiva) return; let container = document.getElementById("salon-orders"); if(!container) return; let activos = getActivos(); if(!activos.length) { container.innerHTML = '<div class="salon-empty"><span class="ic-empty">🍔</span>Sin pedidos activos</div>'; return; } let mostrar = activos.slice(0, 5); container.innerHTML = ""; mostrar.forEach(([,p]) => { let mins = Math.floor((Date.now()-p.ts)/60000); let pct = Math.min(100, Math.round(mins/TIEMPO_OBJETIVO*100)); let barCol = pct<60?"#4CAF50":pct<100?"var(--gold)":"#E24B4A"; let estadoClass = p.estado==="listo"?"listo":p.estado==="preparando"?"preparando":"nuevo"; let badgeText = p.estado==="nuevo"?"NUEVO PEDIDO":p.estado==="preparando"?"EN PREPARACIÓN":"✓ LISTO"; let tipoLabel = p.tipo==="llevar"?"🛍 Para llevar":"🪑 Local"; let card = document.createElement("div"); card.className = `scard ${estadoClass}`; card.innerHTML = `<div class="scard-badge ${estadoClass}">${badgeText}</div><div class="scard-num">#${String(p.num).padStart(3,"0")}</div><div class="scard-cli">${p.cliente}</div><div class="scard-items">${p.items.map(i=>`${i.qty}x ${i.name}`).join("<br>")}</div><div class="scard-tipo">${tipoLabel}</div><div class="scard-tbar"><div class="scard-tbfill" style="width:${pct}%;background:${barCol};"></div></div>`; container.appendChild(card); }); }
-function renderStats() { if(!suscripcionActiva) return; const desde = document.getElementById("stats-fecha-desde").value; const hasta = document.getElementById("stats-fecha-hasta").value; const tsDesde = desde ? new Date(desde+"T00:00:00").getTime() : 0; const tsHasta = hasta ? new Date(hasta+"T23:59:59").getTime() : Date.now(); const lista = Object.entries(pedidos).filter(([,p])=>p.ts>=tsDesde&&p.ts<=tsHasta).sort(([,a],[,b])=>a.ts-b.ts); const total = lista.reduce((s,[,p])=>s+p.total,0); const cnt = lista.length; const ticket = cnt ? Math.round(total/cnt) : 0; const recurSet = new Set(); lista.forEach(([,p]) => { const wa = normalizeWA(p.wa||""); const hist = Object.values(pedidos).filter(x=>normalizeWA(x.wa||"")===wa&&x.estado==="entregado"); if(hist.length>=VISITAS_RECURRENTE) recurSet.add(wa); }); const tiempos = lista.filter(([,p])=>p.tsListo&&p.ts).map(([,p])=>Math.floor((p.tsListo-p.ts)/60000)); const avgTime = tiempos.length ? Math.round(tiempos.reduce((a,b)=>a+b,0)/tiempos.length) : 0; document.getElementById("kpis").innerHTML= `<div class="kpi"><div class="kpin">${cnt}</div><div class="kpil">PEDIDOS</div></div><div class="kpi"><div class="kpin" style="color:#4CAF50;">$${(total/1000).toFixed(0)}K</div><div class="kpil">VENTAS TOTALES</div></div><div class="kpi"><div class="kpin">$${(ticket/1000).toFixed(0)}K</div><div class="kpil">TICKET PROM.</div></div><div class="kpi"><div class="kpin" style="color:var(--gold);">${recurSet.size}</div><div class="kpil">CLIENTES FREC.</div></div><div class="kpi"><div class="kpin">${avgTime||"—"} min</div><div class="kpil">TIEMPO PROM.</div></div>`; const tbody = document.getElementById("stbl-body"); tbody.innerHTML = ""; lista.forEach(([,p]) => { const hora = new Date(p.ts).toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}); const productos = p.items.map(i=>`${i.qty}× ${i.name}`).join(", "); const tr = document.createElement("tr"); tr.innerHTML=`<td>${hora}</td><td>${p.cliente}</td><td>${p.waRaw||p.wa||"—"}</td><td>${p.tipo==="llevar"?"Llevar":"Local"}</td><td style="font-size:9px;">${productos}</td><td style="color:var(--gold);">$${(p.total/1000).toFixed(0)}K</td><td>${p.estado}</td>`; tbody.appendChild(tr); }); }
+function renderStats() { if(!suscripcionActiva) return; const desde = document.getElementById("stats-fecha-desde").value; const hasta = document.getElementById("stats-fecha-hasta").value; const tsDesde = desde ? new Date(desde+"T00:00:00").getTime() : 0; const tsHasta = hasta ? new Date(hasta+"T23:59:59").getTime() : Date.now(); const lista = Object.entries(pedidos).filter(([,p])=>p.ts>=tsDesde&&p.ts<=tsHasta).sort(([,a],[,b])=>a.ts-b.ts); const total = lista.reduce((s,[,p])=>s+p.total,0); const cnt = lista.length; const ticket = cnt ? Math.round(total/cnt) : 0; const recurSet = new Set(); lista.forEach(([,p]) => { const wa = normalizeWA(p.wa||""); const hist = Object.values(pedidos).filter(x=>normalizeWA(x.wa||"")===wa&&x.estado==="entregado"); if(hist.length>=VISITAS_RECURRENTE) recurSet.add(wa); }); const tiempos = lista.filter(([,p])=>p.tsListo&&p.ts).map(([,p])=>Math.floor((p.tsListo-p.ts)/60000)); const avgTime = tiempos.length ? Math.round(tiempos.reduce((a,b)=>a+b,0)/tiempos.length) : 0; document.getElementById("kpis").innerHTML= `<div class="kpi"><div class="kpin">${cnt}</div><div class="kpil">PEDIDOS</div></div><div class="kpi"><div class="kpin" style="color:#4CAF50;">$${(total/1000).toFixed(0)}K</div><div class="kpil">VENTAS TOTALES</div></div><div class="kpi"><div class="kpin">$${(ticket/1000).toFixed(0)}K</div><div class="kpil">TICKET PROM.</div></div><div class="kpi"><div class="kpin" style="color:var(--gold);">${recurSet.size}</div><div class="kpil">CLIENTES FREC.</div></div><div class="kpi"><div class="kpin">${avgTime||"—"} min</div><div class="kpil">TIEMPO PROM.</div></div>`; const tbody = document.getElementById("stbl-body"); tbody.innerHTML = ""; lista.forEach(([,p]) => { const hora = new Date(p.ts).toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}); const productos = p.items.map(i=>`${i.qty}× ${i.name}`).join(", "); const tr = document.createElement("tr"); tr.innerHTML=`<td>${hora}</td><td>${p.cliente}</td><td>${p.waRaw||p.wa||"—"}</td><td>${p.tipo==="llevar"?"Llevar":"Local"}<td style="font-size:9px;">${productos}</td><td style="color:var(--gold);">$${(p.total/1000).toFixed(0)}K</td><td>${p.estado}</td>`; tbody.appendChild(tr); }); }
 function exportXlsx() { if(!suscripcionActiva) return; const desde = document.getElementById("stats-fecha-desde").value; const hasta = document.getElementById("stats-fecha-hasta").value; const tsDesde = desde ? new Date(desde+"T00:00:00").getTime() : 0; const tsHasta = hasta ? new Date(hasta+"T23:59:59").getTime() : Date.now(); const lista = Object.values(pedidos).filter(p=>p.ts>=tsDesde&&p.ts<=tsHasta).sort((a,b)=>a.ts-b.ts); const fd = desde || "inicio"; const fh = hasta || "hoy"; const maxItems = lista.reduce((m,p)=>Math.max(m,(p.items||[]).length),0); const prodCols = Array.from({length:maxItems},(_,i)=>`Producto ${i+1}`); const rows = [["Hora","Cliente","WhatsApp","Mesa","Tipo",...prodCols,"Observaciones","Total","Estado"]]; lista.forEach(p => { const hora = new Date(p.ts).toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}); const itemCols = Array.from({length:maxItems},(_,i)=>p.items[i]?`${p.items[i].qty}x ${p.items[i].name}`:""); rows.push([hora,p.cliente,p.waRaw||p.wa||"",p.mesa||"",p.tipo,...itemCols,p.obs||"",p.total,p.estado]); }); rows.push([],[`RESUMEN: ${fd} al ${fh}`,"","","","","",lista.reduce((s,p)=>s+p.total,0),""]); const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows); XLSX.utils.book_append_sheet(wb,ws,`Pedidos_${fd}_a_${fh}`); XLSX.writeFile(wb,`Bohemia_${fd}_a_${fh}.xlsx`); }
 function printComanda() { if(!suscripcionActiva) return; if(!orden.length) { toast("No hay productos en la orden"); return; } let nombre = document.getElementById("c-nombre").value.trim()||"Cliente"; let tipo = document.getElementById("c-tipo").value; let obs = document.getElementById("c-obs").value.trim(); let mesa = document.getElementById("c-mesa").value.trim(); let numStr = String(pedidoNum).padStart(3,"0"); let fecha = new Date().toLocaleString("es-CO",{hour12:false}); let total = getTotal(); let line = "──────────────────────────────"; let html=`<div style="font-family:'Courier New',monospace;width:56mm;margin:0 auto;padding:2mm;font-size:9px;"><div style="text-align:center;font-size:12px;font-weight:bold;">BOHEMIA</div><div style="text-align:center;font-size:9px;">HAMBURGUESAS & BAR</div><div style="text-align:center;">📱 310 296 0126</div><div>${line}</div><div>Pedido: <b>#${numStr}</b></div><div>Fecha: ${fecha}</div><div>Cliente: ${nombre}</div><div>Tipo: ${tipo==="llevar"?"Para llevar 🛍":"En el local 🪑"}</div>${mesa?`<div>Mesa: ${mesa}</div>`:""}${obs?`<div>Obs: ${obs}</div>`:""}<div>${line}</div>`; orden.forEach(item => { let sub = item.price*item.qty; html+=`<div style="display:flex;justify-content:space-between;"><span>${item.qty}x ${item.name}</span><span>$${(sub/1000).toFixed(0)}K</span></div>`; }); html+=`<div>${line}</div><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:11px;"><span>TOTAL</span><span>$${(total/1000).toFixed(0)}K</span></div><div>${line}</div><div style="text-align:center;font-size:8px;">¡Gracias por su visita!</div><div style="text-align:center;font-size:8px;">@bohemiahamburguesasybar</div></div>`; let v = window.open("","_blank","width=300,height=450"); v.document.write(`<html><head><title>Comanda #${numStr}</title><style>@page{margin:0;}body{margin:0;background:white;}</style></head><body>${html}</body></html>`); v.document.close(); v.print(); }
-function cargarAdminLista() { let container = document.getElementById("admin-lista"); if(!container) return; container.innerHTML = ""; for(let cat in MENU) { container.innerHTML+=`<h3 style="margin:6px 0 3px;font-size:.85rem;color:var(--gold);font-family:'Bebas Neue',sans-serif;">${cat}</h3>`; MENU[cat].forEach(item => { container.innerHTML+=`<div style="background:var(--d2);margin:3px 0;padding:5px;border-radius:7px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--bo);"><span style="font-size:10px;"><b>${item.name}</b> · $${(item.price/1000).toFixed(0)}K</span><div><button onclick="editarProducto('${cat}','${item.id}')" style="margin-right:5px;background:transparent;border:none;cursor:pointer;">✏️</button><button onclick="eliminarProducto('${cat}','${item.id}')" style="background:transparent;border:none;cursor:pointer;">🗑️</button></div></div>`; }); } }
-function editarProducto(cat, id) { let p = MENU[cat].find(p=>p.id===id); if(!p) return; document.getElementById("prod-id").value = id; document.getElementById("prod-nombre").value = p.name; document.getElementById("prod-precio").value = p.price; document.getElementById("prod-categoria").value = cat; document.getElementById("prod-empaque").checked = p.empaque||false; document.getElementById("prod-sabores").checked = !!p.sabores; document.getElementById("prod-sabores-list").value = p.sabores ? p.sabores.join(",") : ""; }
-function eliminarProducto(cat, id) { if(confirm("¿Eliminar este producto?")) { MENU[cat] = MENU[cat].filter(p=>p.id!==id); if(!MENU[cat].length) delete MENU[cat]; db.ref("menu").set(MENU); cargarAdminLista(); } }
-function guardarProducto() { let id = document.getElementById("prod-id").value||Date.now().toString(); let nombre = document.getElementById("prod-nombre").value.trim(); let precio = parseInt(document.getElementById("prod-precio").value); let categoria = document.getElementById("prod-categoria").value; let empaque = document.getElementById("prod-empaque").checked; let tieneSabores = document.getElementById("prod-sabores").checked; let saboresStr = document.getElementById("prod-sabores-list").value; if(!nombre||isNaN(precio)) { alert("Ingresa nombre y precio válidos"); return; } let producto = {id, name:nombre, price:precio}; if(empaque) producto.empaque = true; if(tieneSabores&&saboresStr) producto.sabores = saboresStr.split(",").map(s=>s.trim()); if(!MENU[categoria]) MENU[categoria] = []; let idx = MENU[categoria].findIndex(p=>p.id===id); if(idx>=0) MENU[categoria][idx] = producto; else MENU[categoria].push(producto); db.ref("menu").set(MENU); limpiarFormProducto(); cargarAdminLista(); toast("✅ Producto guardado"); }
+
+// ========== FUNCIONES ADMIN CORREGIDAS ==========
+function cargarAdminLista() {
+  let container = document.getElementById("admin-lista"); if(!container) return;
+  container.innerHTML = "";
+  for(let cat in MENU) {
+    container.innerHTML+=`<h3 style="margin:6px 0 3px;font-size:.85rem;color:var(--gold);font-family:'Bebas Neue',sans-serif;">${cat}</h3>`;
+    MENU[cat].forEach(item => {
+      container.innerHTML+=`<div style="background:var(--d2);margin:3px 0;padding:5px;border-radius:7px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--bo);">
+        <span style="font-size:10px;"><b>${item.name}</b> · $${(item.price/1000).toFixed(0)}K</span>
+        <div><button onclick="editarProducto('${cat}','${item.id}')" style="margin-right:5px;background:transparent;border:none;cursor:pointer;">✏️</button><button onclick="eliminarProducto('${cat}','${item.id}')" style="background:transparent;border:none;cursor:pointer;">🗑️</button></div>
+      </div>`;
+    });
+  }
+}
+function editarProducto(cat, id) {
+  let p = MENU[cat]?.find(p=>p.id===id);
+  if(!p) { toast("Producto no encontrado"); return; }
+  document.getElementById("prod-id").value = id;
+  document.getElementById("prod-nombre").value = p.name;
+  document.getElementById("prod-precio").value = p.price;
+  document.getElementById("prod-categoria").value = cat;
+  document.getElementById("prod-empaque").checked = p.empaque||false;
+  document.getElementById("prod-sabores").checked = !!p.sabores;
+  document.getElementById("prod-sabores-list").value = p.sabores ? p.sabores.join(",") : "";
+}
+function eliminarProducto(cat, id) {
+  if(confirm("¿Eliminar este producto?")) {
+    MENU[cat] = MENU[cat].filter(p=>p.id!==id);
+    if(!MENU[cat].length) delete MENU[cat];
+    db.ref("menu").set(MENU);
+    toast("✅ Producto eliminado");
+    cargarAdminLista();
+    if(modo==="cajero") buildMenu();
+  }
+}
+function guardarProducto() {
+  let id = document.getElementById("prod-id").value || Date.now().toString();
+  let nombre = document.getElementById("prod-nombre").value.trim();
+  let precio = parseInt(document.getElementById("prod-precio").value);
+  let categoria = document.getElementById("prod-categoria").value;
+  let empaque = document.getElementById("prod-empaque").checked;
+  let tieneSabores = document.getElementById("prod-sabores").checked;
+  let saboresStr = document.getElementById("prod-sabores-list").value;
+  if(!nombre||isNaN(precio)) { toast("Ingresa nombre y precio válidos"); return; }
+  let producto = {id, name:nombre, price:precio};
+  if(empaque) producto.empaque = true;
+  if(tieneSabores&&saboresStr) producto.sabores = saboresStr.split(",").map(s=>s.trim());
+  if(!MENU[categoria]) MENU[categoria] = [];
+  let idx = MENU[categoria].findIndex(p=>p.id===id);
+  if(idx>=0) MENU[categoria][idx] = producto;
+  else MENU[categoria].push(producto);
+  db.ref("menu").set(MENU);
+  limpiarFormProducto();
+  cargarAdminLista();
+  if(modo==="cajero") buildMenu();
+  toast("✅ Producto guardado");
+}
 function limpiarFormProducto() { ["prod-id","prod-nombre","prod-precio","prod-sabores-list"].forEach(id=>document.getElementById(id).value=""); document.getElementById("prod-empaque").checked=false; document.getElementById("prod-sabores").checked=false; }
+
+// ========== FUNCIONES ZOOM COCINA ==========
 let anchoMinimoTarjeta = 220;
 function actualizarGridTV() { const tvGrid = document.getElementById('tv-grid'); if(tvGrid) tvGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${anchoMinimoTarjeta}px, 1fr))`; localStorage.setItem('boh_tvGridMinWidth', anchoMinimoTarjeta); }
 function zoomMas() { anchoMinimoTarjeta = Math.min(anchoMinimoTarjeta+30,500); actualizarGridTV(); }
@@ -550,54 +768,110 @@ function aplicarTvitFontSize() { document.querySelectorAll('#tv-grid .tvit').for
 function textoMas() { tvitFontSize = Math.min(tvitFontSize+.2,3.5); aplicarTvitFontSize(); }
 function textoMenos() { tvitFontSize = Math.max(tvitFontSize-.2,1.0); aplicarTvitFontSize(); }
 function restaurarTvitFontSize() { const saved = localStorage.getItem('boh_tvitFontSize'); if(saved && !isNaN(parseFloat(saved))) tvitFontSize = parseFloat(saved); }
+
+// ========== FUNCIONES VERIFICACIÓN SUSCRIPCIÓN ==========
 function verificarSuscripcion() { db.ref('config/fechaExpiracion').on('value', (snap) => { let fechaExpiracion = snap.val(); if(!fechaExpiracion) { const fechaDefecto = new Date(Date.UTC(2026, 5, 30, 4, 59, 59)); fechaExpiracion = fechaDefecto.getTime(); db.ref('config/fechaExpiracion').set(fechaExpiracion); } suscripcionActiva = Date.now() <= fechaExpiracion; const block = document.getElementById('blockScreen'); const sel = document.getElementById('sel'); if(!suscripcionActiva) { block.style.display = 'flex'; sel.style.display = 'none'; ['caj','coc','salon','stats','admin'].forEach(id => document.getElementById(id).style.display = 'none'); } else { block.style.display = 'none'; if(modo === '') sel.style.display = 'flex'; } }); }
 
-// ========== NUEVAS FUNCIONES PARA EL MODO SALÓN (webOS HDMI) ==========
+// ========== FUNCIONES MODO SALÓN (ADAPTADO A WhaleOS) ==========
 let isWebOS = false;
-let currentSource = null; // 'hdmi1', 'hdmi2', 'youtube'
+let isWhaleOS = false;
+let currentMode = 'tv'; // 'tv', 'youtube'
 let youtubeIframe = null;
 
-function detectWebOS() {
-  // Detección de webOS mediante user agent o propiedad específica
+function detectTVPlatform() {
   const ua = navigator.userAgent.toLowerCase();
-  if (ua.indexOf('webos') !== -1 || ua.indexOf('lg browser') !== -1 || window.webOS) {
-    isWebOS = true;
-    document.getElementById('webosStatus').innerHTML = '✅ Modo webOS detectado. Puede mostrar HDMI en segundo plano.';
-    document.getElementById('webosStatus').style.color = '#C9A227';
-    return true;
+  isWebOS = (ua.indexOf('webos') !== -1 || ua.indexOf('lg browser') !== -1 || window.webOS);
+  isWhaleOS = (ua.indexOf('whale') !== -1 || ua.indexOf('whaleos') !== -1 || ua.indexOf('zeasn') !== -1);
+  
+  const statusDiv = document.getElementById('webosStatus');
+  if (isWebOS) {
+    statusDiv.innerHTML = '✅ Plataforma webOS detectada. Modo HDMI automático activado.';
+    statusDiv.style.color = '#C9A227';
+  } else if (isWhaleOS) {
+    statusDiv.innerHTML = '🐋 Plataforma WhaleOS detectada. Usa el botón "Pantalla Completa + HDMI" para ver TV y luego regresa a la app.';
+    statusDiv.style.color = '#F5D060';
   } else {
-    document.getElementById('webosStatus').innerHTML = '⚠️ Este navegador NO es webOS. La función HDMI solo es válida en televisores webOS (LG, Caixun). Para ver DirectTV, cambie manualmente la entrada del TV.';
-    document.getElementById('webosStatus').style.color = '#F5D060';
-    return false;
+    statusDiv.innerHTML = 'ℹ️ Navegador estándar. Para ver TV, cambia manualmente la entrada HDMI de tu televisor y luego vuelve a esta app.';
+    statusDiv.style.color = '#F5D060';
   }
+  return isWebOS || isWhaleOS;
 }
 
 function setHDMISource(puerto) {
   const video = document.getElementById('salonBgVideo');
   if (!video) return;
   if (!isWebOS) {
-    toast('Función HDMI solo disponible en televisores webOS. Usa el control remoto para cambiar la entrada.');
+    // En WhaleOS o navegador normal, mostrar instrucción
+    showTVInstruction();
     return;
   }
-  // Crear source con tipo especial webOS
-  video.innerHTML = ''; // limpiar
+  // Solo webOS puede incrustar HDMI directamente
+  video.innerHTML = '';
   const source = document.createElement('source');
   source.type = 'service/webos-external';
   source.src = `ext://hdmi:${puerto}`;
   video.appendChild(source);
   video.load();
   video.play().catch(e => console.log("Error reproduciendo HDMI:", e));
-  currentSource = `hdmi${puerto}`;
-  // Ocultar botón restaurar si estaba visible
+  currentMode = 'tv';
   document.getElementById('btnRestaurarTV').style.display = 'none';
   toast(`Mostrando HDMI ${puerto} en segundo plano.`);
+}
+
+function showTVInstruction() {
+  // Ocultar el video de fondo y mostrar un mensaje
+  const video = document.getElementById('salonBgVideo');
+  video.style.display = 'none';
+  
+  // Crear o actualizar un elemento de instrucción
+  let instructionDiv = document.getElementById('tvInstruction');
+  if (!instructionDiv) {
+    instructionDiv = document.createElement('div');
+    instructionDiv.id = 'tvInstruction';
+    instructionDiv.style.position = 'absolute';
+    instructionDiv.style.top = '50%';
+    instructionDiv.style.left = '50%';
+    instructionDiv.style.transform = 'translate(-50%, -50%)';
+    instructionDiv.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    instructionDiv.style.color = 'white';
+    instructionDiv.style.padding = '20px';
+    instructionDiv.style.borderRadius = '10px';
+    instructionDiv.style.textAlign = 'center';
+    instructionDiv.style.zIndex = '5';
+    instructionDiv.style.maxWidth = '80%';
+    document.querySelector('#salon .salon-ui').appendChild(instructionDiv);
+  }
+  instructionDiv.innerHTML = `
+    <h2>📺 Modo TV</h2>
+    <p>Para ver DirectTV con tu barra lateral de pedidos:</p>
+    <ol style="text-align: left; margin: 10px 0;">
+      <li>Presiona el botón <strong>INPUT/SOURCE</strong> en tu control remoto</li>
+      <li>Selecciona el puerto <strong>HDMI</strong> donde está conectado tu decodificador</li>
+      <li>La barra lateral de Bohemia seguirá visible mientras ves tu contenido</li>
+    </ol>
+    <button id="closeInstruction" class="bsm" style="background: var(--gold); color:#000;">✅ Entendido</button>
+  `;
+  instructionDiv.style.display = 'block';
+  document.getElementById('closeInstruction').onclick = () => {
+    instructionDiv.style.display = 'none';
+    video.style.display = 'block';
+    // Mostrar un video demo mientras tanto
+    video.innerHTML = '';
+    const source = document.createElement('source');
+    source.type = 'video/mp4';
+    source.src = 'https://www.w3schools.com/html/mov_bbb.mp4';
+    video.appendChild(source);
+    video.load();
+    video.play().catch(e => console.log);
+    video.loop = true;
+    toast('Video de demostración. Para ver TV real, cambia la entrada manualmente.');
+  };
+  currentMode = 'tv';
 }
 
 function loadYouTube(url) {
   const video = document.getElementById('salonBgVideo');
   if (!video) return;
-  // Para YouTube, necesitamos un iframe en lugar del video nativo. Pero queremos mantener el fondo.
-  // Crearemos un iframe que ocupe la misma posición y ocultaremos el video.
   let existingIframe = document.getElementById('youtubeBgIframe');
   if (existingIframe) existingIframe.remove();
   
@@ -613,7 +887,6 @@ function loadYouTube(url) {
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
   
-  // Extraer ID de video
   let videoId = '';
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = url.match(regExp);
@@ -624,12 +897,11 @@ function loadYouTube(url) {
     return;
   }
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&mute=0`;
-  // Ocultar video nativo
   video.style.display = 'none';
   document.querySelector('.salon-ui').appendChild(iframe);
-  currentSource = 'youtube';
+  currentMode = 'youtube';
   document.getElementById('btnRestaurarTV').style.display = 'inline-flex';
-  toast('Reproduciendo YouTube. Presiona "Volver a TV" para restaurar HDMI.');
+  toast('Reproduciendo YouTube. Presiona "Volver a Modo TV" para restaurar.');
 }
 
 function restoreTV() {
@@ -637,38 +909,32 @@ function restoreTV() {
   const iframe = document.getElementById('youtubeBgIframe');
   if (iframe) iframe.remove();
   video.style.display = 'block';
-  // Restaurar última HDMI activa (por defecto HDMI1)
+  // Restaurar según plataforma
   if (isWebOS) {
     setHDMISource(1);
   } else {
-    toast('No se puede restaurar HDMI porque no es webOS.');
+    // En WhaleOS, volver a mostrar instrucción
+    showTVInstruction();
   }
   document.getElementById('btnRestaurarTV').style.display = 'none';
 }
 
 function initSalonMode() {
-  detectWebOS();
+  detectTVPlatform();
   startSalonClock();
   renderSalon();
-  // Si es webOS, iniciar automáticamente HDMI 1
-  if (isWebOS) {
-    setHDMISource(1);
-  } else {
-    // En navegador normal, mostrar un mensaje en el video o un video de demostración
-    const video = document.getElementById('salonBgVideo');
-    video.innerHTML = '';
-    const source = document.createElement('source');
-    source.type = 'video/mp4';
-    source.src = 'https://www.w3schools.com/html/mov_bbb.mp4'; // demo
-    video.appendChild(source);
-    video.load();
-    video.play().catch(e => console.log);
-    video.loop = true;
-    toast('Modo demostración: video de ejemplo. HDMI solo en webOS.');
-  }
-  // Configurar botones
-  document.getElementById('btnHDMI1').onclick = () => { if(isWebOS) setHDMISource(1); else toast('HDMI solo en webOS'); };
-  document.getElementById('btnHDMI2').onclick = () => { if(isWebOS) setHDMISource(2); else toast('HDMI solo en webOS'); };
+  
+  // Configurar botón principal HDMI
+  const btnHDMI = document.getElementById('btnHDMIAction');
+  btnHDMI.onclick = () => {
+    if (isWebOS) {
+      setHDMISource(1);
+    } else {
+      showTVInstruction();
+    }
+  };
+  
+  // Configurar botón YouTube
   document.getElementById('btnYouTube').onclick = () => {
     let url = document.getElementById('youtubeUrl').value.trim();
     if (!url) url = prompt('Ingresa la URL de YouTube:', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
@@ -680,6 +946,13 @@ function initSalonMode() {
     else toast('Escribe una URL');
   };
   document.getElementById('btnRestaurarTV').onclick = restoreTV;
+  
+  // Iniciar automáticamente
+  if (isWebOS) {
+    setHDMISource(1);
+  } else {
+    showTVInstruction();
+  }
 }
 
 // ========== EVENTOS Y ARRANQUE ==========
@@ -728,7 +1001,6 @@ function setMode(m) {
 function goHome() {
   modo = "";
   if(salonClockInterval) { clearInterval(salonClockInterval); salonClockInterval=null; }
-  // Limpiar recursos del salón
   const iframe = document.getElementById('youtubeBgIframe');
   if(iframe) iframe.remove();
   document.getElementById("sel").style.display = "flex";
