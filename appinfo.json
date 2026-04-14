@@ -1,0 +1,30 @@
+{
+  "id": "com.tuempresa.bohemia",
+  "version": "1.0.0",
+  "type": "web",
+  "title": "Bohemia Salón TV",
+  "icon": "icon.png",
+  "bgImage": "bg.png",
+  "main": "index.html",
+  "resolution": "1920x1080",
+  "supportTouchMode": false,
+  "supportKeyboard": true,
+  "supportMouse": false,
+  "appMode": "video",
+  "window": {
+    "width": 1920,
+    "height": 1080,
+    "left": 0,
+    "top": 0
+  },
+  "permissions": [
+    "video.broadcast",
+    "system.network",
+    "database"
+  ],
+  "capabilities": {
+    "video/broadcast": true,
+    "hbbtv": true,
+    "oipf": true
+  }
+}
