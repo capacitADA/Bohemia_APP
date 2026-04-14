@@ -58,11 +58,12 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 .cats{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;} /* menos espacio */
 .cat{font-size:9px;padding:3px 10px;border-radius:16px;border:1px solid var(--bo);background:transparent;color:var(--mu);cursor:pointer;transition:all .15s;}
 .cat.on{background:var(--gold);color:#000;font-weight:700;}
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:3px;} /* más compacto */
-.mitem{background:var(--d3);border:1px solid var(--bo);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;transition:border-color .15s;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:3px;}
+.mitem{background:var(--d3);border:1px solid var(--bo);border-radius:8px;padding:3px 2px 2px;text-align:center;cursor:pointer;transition:border-color .15s;}
+.mitem.wide{grid-column:span 2;}
 .mitem:hover{border-color:var(--gold);}
-.mn{font-size:8px;font-weight:500;line-height:1.2;}
-.mp{font-size:8px;color:var(--gold);font-weight:700;} /* reducido de 10px a 8px (≈2pt menos) */
+.mn{font-size:9px;font-weight:500;line-height:1.2;}
+.mp{font-size:7px;color:var(--gold);font-weight:700;margin-top:1px;}
 .mt{font-size:7px;color:var(--mu);}
 .cbox{background:var(--dark);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:3px;border:1px solid var(--bo);}
 .lbl{font-size:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;}
@@ -96,7 +97,7 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
 .ptime{font-size:8px;text-align:right;color:var(--mu);}
 .tbar{height:3px;margin-top:3px;background:var(--d4);border-radius:2px;overflow:hidden;}
 .tbfill{height:100%;border-radius:2px;transition:width .3s;}
-.prioctrl{display:flex;gap:2px;margin-top:3px;}
+.prioctrl{display:flex;gap:2px;}
 .priobtn{padding:2px 5px;font-size:8px;cursor:pointer;background:var(--d4);border:1px solid var(--bo);color:var(--cream);border-radius:4px;}
 
 /* Cocina TV */
@@ -629,6 +630,7 @@ function buildMenu() {
   });
   renderItems();
 }
+function needsWide(name) { return name.length > 14; }
 function renderItems() {
   let grid = document.getElementById("mgrid"); if(!grid) return;
   grid.innerHTML = "";
@@ -636,13 +638,16 @@ function renderItems() {
   items.forEach(item => {
     if(item.sabores && item.sabores.length) {
       item.sabores.forEach(sabor => {
-        let div = document.createElement("div"); div.className = "mitem";
+        let fullName = `${item.name} ${sabor}`;
+        let div = document.createElement("div");
+        div.className = "mitem" + (needsWide(fullName) ? " wide" : "");
         div.innerHTML = `<div class="mn">${item.name}<br><small style="color:var(--mu)">${sabor}</small></div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`;
-        div.onclick = () => addToOrder({...item, name:`${item.name} ${sabor}`, id:item.id+"_"+sabor, categoria:catActual});
+        div.onclick = () => addToOrder({...item, name:fullName, id:item.id+"_"+sabor, categoria:catActual});
         grid.appendChild(div);
       });
     } else {
-      let div = document.createElement("div"); div.className = "mitem";
+      let div = document.createElement("div");
+      div.className = "mitem" + (needsWide(item.name) ? " wide" : "");
       div.innerHTML = `<div class="mn">${item.name}</div><div class="mp">$${(item.price/1000).toFixed(0)}K</div>`;
       div.onclick = () => addToOrder({...item, categoria:catActual});
       grid.appendChild(div);
@@ -740,13 +745,15 @@ function renderCola() {
     else if(p.estado==="preparando") actHtml=`<button class="kbtn klisto" data-key="${key}" data-estado="listo">Listo ✓</button>`;
     else if(p.estado==="listo") actHtml=`<button class="kbtn kwa" data-key="${key}" data-wa>WhatsApp</button>`;
     let prioCtrl=`<div class="prioctrl"><button class="priobtn" data-key="${key}" data-dir="-1">↑</button><button class="priobtn" data-key="${key}" data-dir="1">↓</button></div>`;
-    card.innerHTML=`<div style="display:flex;justify-content:space-between;"><div class="pcnum">#${String(p.num).padStart(3,"0")}</div><div>${badge}</div></div>
+    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:5px;"><div class="pcnum">#${String(p.num).padStart(3,"0")}</div>${actHtml}</div>
+        <div style="display:flex;align-items:center;gap:3px;">${badge}${prioCtrl}</div>
+      </div>
       <div class="pcli">${p.cliente} · ${p.tipo==="llevar"?"Llevar":"Local"}</div>
       <div class="pitem">${p.items.map(i=>`${i.qty}× ${i.name}`).join(", ")}</div>
       ${p.obs?`<div style="color:var(--gold);font-size:8px;">📝 ${p.obs}</div>`:""}
       <div class="tbar"><div class="tbfill" style="width:${pct}%;background:${barCol};"></div></div>
-      <div class="ptime">Hace ${mins} min · $${(p.total/1000).toFixed(0)}K</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">${actHtml}${prioCtrl}</div>`;
+      <div class="ptime">Hace ${mins} min · $${(p.total/1000).toFixed(0)}K</div>`;
     el.appendChild(card);
   });
   document.querySelectorAll('#cola-d .kbtn.kpre').forEach(btn=>btn.addEventListener('click',()=>cambiarEstado(btn.dataset.key,'preparando')));
