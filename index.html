@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bohemia Salón TV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: black;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'DM Sans', sans-serif;
+            color: white;
+        }
+
+        /* Contenedor principal: 80% video, 20% barra lateral */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Área de video HDMI */
+        .video-area {
+            flex: 4; /* 80% del ancho */
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        /* Objeto que incrusta la señal HDMI */
+        #hdmiPlayer {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: none;
+            outline: none;
+        }
+
+        /* Barra lateral de pedidos (20%) */
+        .orders-area {
+            flex: 1; /* 20% restante */
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 2px solid #C9A227;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 16px 12px;
+            font-size: 14px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        /* Encabezado de la barra */
+        .orders-header {
+            text-align: center;
+            border-bottom: 1px solid #C9A227;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .orders-header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 28px;
+            color: #C9A227;
+            letter-spacing: 2px;
+        }
+        .orders-header p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Lista de pedidos */
+        #pedidosLista {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+        }
+
+        /* Tarjeta de pedido */
+        .pedido-card {
+            background: rgba(30,30,30,0.8);
+            border-radius: 16px;
+            padding: 12px;
+            border-left: 6px solid #C9A227;
+            transition: 0.2s;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .pedido-card.nuevo { border-left-color: #C9A227; }
+        .pedido-card.preparando { border-left-color: #F5C842; }
+        .pedido-card.listo { border-left-color: #4CAF50; }
+
+        .pedido-num {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #C9A227;
+        }
+        .pedido-cliente {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 4px 0;
+        }
+        .pedido-items {
+            font-size: 12px;
+            color: #ddd;
+            margin: 6px 0;
+            word-break: break-word;
+        }
+        .pedido-tipo {
+            font-size: 11px;
+            background: rgba(0,0,0,0.5);
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .pedido-tiempo {
+            font-size: 10px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 6px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #aaa;
+            padding: 30px 10px;
+        }
+
+        /* Pequeño logo */
+        .footer-logo {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 10px;
+            color: #C9A227;
+            border-top: 1px solid rgba(201,162,39,0.3);
+            padding-top: 12px;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <!-- 80% HDMI 1 -->
+    <div class="video-area">
+        <!-- Objeto mágico de WhaleOS/HbbTV para incrustar HDMI 1 -->
+        <object id="hdmiPlayer" type="video/broadcast" style="width:100%; height:100%;" data=""></object>
+    </div>
+
+    <!-- 20% Barra de pedidos -->
+    <div class="orders-area">
+        <div class="orders-header">
+            <h1>🍔 PEDIDOS EN VIVO</h1>
+            <p>Bohemia Hamburguesas & Bar</p>
+        </div>
+        <div id="pedidosLista">
+            <div class="empty-message">Cargando pedidos...</div>
+        </div>
+        <div class="footer-logo">
+            Bohemia Salón TV
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== CONFIGURACIÓN DE FIREBASE (TUS DATOS) ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZS0NoGIG8EJyRuW7QKBhNG3B6oFn2KCk",
+        authDomain: "bohemiaapp-aaac0.firebaseapp.com",
+        databaseURL: "https://bohemiaapp-aaac0-default-rtdb.firebaseio.com",
+        projectId: "bohemiaapp-aaac0",
+        storageBucket: "bohemiaapp-aaac0.firebasestorage.app",
+        messagingSenderId: "1086507320484",
+        appId: "1:1086507320484:web:0acbf690310a24a3f0d231"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ========== FUNCIONES AUXILIARES ==========
+    function formatTiempo(timestamp) {
+        if (!timestamp) return "justo ahora";
+        const minutos = Math.floor((Date.now() - timestamp) / 60000);
+        if (minutos < 1) return "hace segundos";
+        if (minutos === 1) return "hace 1 min";
+        return `hace ${minutos} min`;
+    }
+
+    // Función para renderizar los pedidos activos (no entregados)
+    function renderizarPedidos(pedidosObj) {
+        const container = document.getElementById("pedidosLista");
+        if (!container) return;
+
+        // Convertir objeto a array y filtrar estados != "entregado"
+        const pedidosArray = Object.entries(pedidosObj)
+            .map(([key, p]) => ({ ...p, firebaseKey: key }))
+            .filter(p => p.estado !== "entregado")
+            .sort((a, b) => (b.prioridad || 0) - (a.prioridad || 0) || (a.ts || 0) - (b.ts || 0));
+
+        if (pedidosArray.length === 0) {
+            container.innerHTML = '<div class="empty-message">✨ Sin pedidos activos<br>Disfruta la transmisión</div>';
+            return;
+        }
+
+        let html = "";
+        for (const p of pedidosArray) {
+            const estadoClass = p.estado === "nuevo" ? "nuevo" : (p.estado === "preparando" ? "preparando" : "listo");
+            const badgeTexto = p.estado === "nuevo" ? "🆕 NUEVO" : (p.estado === "preparando" ? "⚙️ PREPARANDO" : "✅ LISTO");
+            const itemsTexto = p.items.map(i => `${i.qty} × ${i.name}`).join("<br>");
+            const tipoIcono = p.tipo === "llevar" ? "📦 Para llevar" : "🍽️ Local";
+            const tiempo = formatTiempo(p.ts);
+
+            html += `
+                <div class="pedido-card ${estadoClass}">
+                    <div class="pedido-num">#${String(p.num).padStart(3, "0")}</div>
+                    <div class="pedido-cliente">${escapeHtml(p.cliente)}</div>
+                    <div class="pedido-items">${itemsTexto}</div>
+                    <div><span class="pedido-tipo">${tipoIcono}</span> ${p.mesa ? ` · Mesa ${p.mesa}` : ""}</div>
+                    <div class="pedido-tiempo">⏱ ${tiempo}</div>
+                    <div style="font-size:9px; margin-top:4px;">${badgeTexto}</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // Escapar HTML por seguridad
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // ========== INICIALIZAR HDMI EN WHALEOS ==========
+    function iniciarHDMI() {
+        const videoObj = document.getElementById("hdmiPlayer");
+        if (!videoObj) return;
+
+        // Método estándar HbbTV / OIPF para vincular a la fuente actual (HDMI 1)
+        // Primero intentamos bindToCurrentChannel() si existe
+        if (typeof videoObj.bindToCurrentChannel === "function") {
+            try {
+                videoObj.bindToCurrentChannel();
+                console.log("HDMI vinculado con bindToCurrentChannel()");
+            } catch(e) {
+                console.warn("bindToCurrentChannel falló", e);
+                fallbackHDMI(videoObj);
+            }
+        } else {
+            // Fallback: establecer src directo a ext://hdmi:1 (típico en WhaleOS)
+            fallbackHDMI(videoObj);
+        }
+    }
+
+    function fallbackHDMI(obj) {
+        // Para WhaleOS, se puede usar el atributo data o src
+        obj.setAttribute("data", "ext://hdmi:1");
+        // Algunas versiones necesitan recargar el objeto
+        try {
+            obj.refresh && obj.refresh();
+        } catch(e) {}
+        console.log("Fallback: se estableció ext://hdmi:1");
+    }
+
+    // ========== ESCUCHAR PEDIDOS EN TIEMPO REAL ==========
+    function escucharPedidos() {
+        const pedidosRef = db.ref("pedidos");
+        pedidosRef.on("value", (snapshot) => {
+            const data = snapshot.val() || {};
+            renderizarPedidos(data);
+        }, (error) => {
+            console.error("Error Firebase:", error);
+            document.getElementById("pedidosLista").innerHTML = '<div class="empty-message">⚠️ Error de conexión<br>Reintentando...</div>';
+        });
+    }
+
+    // ========== ARRANQUE ==========
+    window.onload = function() {
+        iniciarHDMI();
+        escucharPedidos();
+
+        // Opcional: cada 30 segundos verificar que el objeto HDMI sigue vivo (algunos TVs lo suspenden)
+        setInterval(() => {
+            const videoObj = document.getElementById("hdmiPlayer");
+            if (videoObj && !videoObj.data && !videoObj.getAttribute("data")) {
+                fallbackHDMI(videoObj);
+            }
+        }, 30000);
+    };
+</script>
+</body>
+</html>
