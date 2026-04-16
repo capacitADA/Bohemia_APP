@@ -448,41 +448,35 @@ body{background:var(--dark);color:var(--cream);font-family:'DM Sans',sans-serif;
       <div class="oit" id="o-items"><div class="empty-o">Toca un producto</div></div>
       <div id="recur-box" style="display:none;background:#1a1a00;padding:4px;border-radius:5px;font-size:8px;border:1px solid var(--gold);margin-bottom:2px;"></div>
 
-      <!-- Formulario -->
+      <!-- Formulario compacto -->
       <div style="display:flex;flex-direction:column;gap:3px;">
-        <!-- Nombre + Limpiar orden -->
+        <!-- Fila 1: NOMBRE + Limpiar orden -->
         <div style="display:flex;align-items:center;gap:4px;">
-          <div class="lbl" style="flex:0 0 52px;">Nombre</div>
+          <div class="lbl" style="flex:0 0 58px;">Nombre</div>
           <input type="text" id="c-nombre" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
           <button class="blnk" onclick="clearOrder()" style="color:#E24B4A;font-size:8px;white-space:nowrap;">Limpiar orden</button>
         </div>
-        <!-- Fila inferior: col izq (WA, Mesa, Tipo) | col der (Observación) -->
-        <div style="display:flex;gap:5px;">
-          <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
-            <div style="display:flex;align-items:center;gap:4px;">
-              <div class="lbl" style="flex:0 0 52px;">WhatsApp</div>
-              <input type="tel" id="c-wa" oninput="checkRecurrente()" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
-            </div>
-            <div style="display:flex;align-items:center;gap:4px;">
-              <div class="lbl" style="flex:0 0 52px;">Mesa</div>
-              <input type="text" id="c-mesa" placeholder="M-" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
-            </div>
-            <div style="display:flex;align-items:center;gap:4px;">
-              <div class="lbl" style="flex:0 0 52px;">Tipo</div>
-              <select id="c-tipo" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
-                <option value="llevar">Para llevar</option>
-                <option value="local">En el local</option>
-              </select>
-            </div>
-          </div>
-          <div style="flex:1;display:flex;flex-direction:column;">
-            <div class="lbl" style="margin-bottom:2px;text-align:center;">Observación</div>
-            <textarea id="c-obs" rows="4" style="flex:1;background:var(--d4);border:1px solid #E24B4A;border-radius:4px;padding:4px;color:var(--cream);font-size:10px;resize:none;"></textarea>
+        <!-- Fila 2: WHATSAPP | MESA -->
+        <div style="display:flex;align-items:center;gap:4px;">
+          <div class="lbl" style="flex:0 0 58px;">WhatsApp</div>
+          <input type="tel" id="c-wa" oninput="checkRecurrente()" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
+          <div class="lbl" style="flex:0 0 32px;text-align:center;">Mesa</div>
+          <input type="text" id="c-mesa" placeholder="M-" style="flex:0 0 60px;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
+        </div>
+        <!-- Fila 3: TIPO | TOTAL -->
+        <div style="display:flex;align-items:center;gap:4px;">
+          <div class="lbl" style="flex:0 0 58px;">Tipo</div>
+          <select id="c-tipo" style="flex:1;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px;color:var(--cream);font-size:10px;">
+            <option value="llevar">Para llevar</option>
+            <option value="local">En el local</option>
+          </select>
+          <div style="flex:1;display:flex;align-items:center;justify-content:space-between;background:var(--d4);border:1px solid var(--bo);border-radius:4px;padding:4px 8px;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--cream);">Total</span>
+            <span class="tv2" id="o-total">$0</span>
           </div>
         </div>
       </div>
-
-      <div class="trow"><span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;">Total</span><span class="tv2" id="o-total">$0</span></div>
+      <textarea id="c-obs" style="display:none;"></textarea>
       <button class="bmain" onclick="confirmar()">✔ Confirmar Pedido</button>
       <button class="bsec" onclick="printComanda()">🖨 Imprimir Comanda</button>
     </div>
@@ -729,8 +723,7 @@ function updateOrderUI(){
 function checkRecurrente() { let wa = normalizeWA(document.getElementById("c-wa").value); let box = document.getElementById("recur-box"); if(!wa) { box.style.display="none"; return; } let hist = Object.values(pedidos).filter(p=>normalizeWA(p.wa||"")===wa && p.estado==="entregado"); if(hist.length>=VISITAS_RECURRENTE) { box.innerHTML = `<strong style="color:var(--gold);">⭐ Cliente Frecuente (${hist.length} visitas)</strong>`; box.style.display="block"; } else box.style.display="none"; }
 function confirmar() { if(!suscripcionActiva) return; let nombre = document.getElementById("c-nombre").value.trim(); if(!orden.length) { toast("Agrega productos al pedido"); return; } if(!nombre) { toast("Ingresa el nombre del cliente"); return; } let waRaw = document.getElementById("c-wa").value.trim(); let wa = normalizeWA(waRaw)||waRaw; let key = "p"+Date.now()+"_"+pedidoNum; let pedido = { num:pedidoNum, cliente:nombre, wa, waRaw, obs:document.getElementById("c-obs").value, mesa:document.getElementById("c-mesa").value.trim(), tipo:document.getElementById("c-tipo").value, items:orden.map(i=>({name:i.name, qty:i.qty, price:i.price, categoria:i.categoria, obs:i.obs||""})), total:getTotal(), estado:"nuevo", prioridad:0, ts:Date.now() }; persist(key, pedido); db.ref("meta/ultimoNumero").set(pedidoNum); pedidoNum++; toast(`✅ Pedido #${pedido.num} confirmado`); clearOrder(); }
 function getActivos() { return Object.entries(pedidos).filter(([,p])=>p.estado!=="entregado").sort(([,a],[,b])=>(b.prioridad||0)-(a.prioridad||0)||a.ts-b.ts).slice(0,30); }
-function renderCola() { if(!suscripcionActiva) return; let el = document.getElementById("cola-d"); if(!el) return; let activos = getActivos(); if(!activos.length) { el.innerHTML="<div style='font-size:10px;color:var(--mu);'>Sin pedidos activos</div>"; return; } el.innerHTML = ""; activos.forEach(([key,p]) => { let mins = Math.floor((Date.now()-p.ts)/60000); let pct = Math.min(100, Math.round(mins/TIEMPO_OBJETIVO*100)); let barCol = pct<60?"#4CAF50":pct<100?"var(--gold)":"#E24B4A"; let card = document.createElement("div"); card.className = "pc"+(p.prioridad?" sprio":""); let estadoColor = p.estado==='nuevo'?'var(--gold)':p.estado==='preparando'?'#F5C842':'#4CAF50'; let badge = `<span style="display:inline-block;width:8px;height:8px;border-radius:8px;background:${estadoColor};margin-right:4px;"></span>`; if(p.prioridad) badge += `<span style="background:var(--gold);color:#000;font-size:7px;padding:0 3px;border-radius:8px;">⭐ PRIO</span>`; let hist = Object.values(pedidos).filter(x=>normalizeWA(x.wa||"")===normalizeWA(p.wa||"") && x.estado==="entregado"); if(hist.length>=VISITAS_RECURRENTE) badge += `<span style="background:#1a2e10;color:#a3d96a;font-size:7px;padding:0 3px;border-radius:8px;margin-left:2px;">Frec</span>`; let actHtml = ""; if(p.estado==="nuevo") actHtml=`<button class="kbtn kpre" data-key="${key}" data-estado="preparando">Preparar</button>`; else if(p.estado==="preparando") actHtml=`<button class="kbtn klisto" data-key="${key}" data-estado="listo">Listo ✓</button>`; else if(p.estado==="listo") actHtml=`<button class="kbtn kwa" data-key="${key}" data-wa>WhatsApp</button>`; let prioCtrl=`<div class="prioctrl"><button class="priobtn" data-key="${key}" data-dir="-1">↑</button><button class="priobtn" data-key="${key}" data-dir="1">↓</button><button class="priobtn" style="color:#E24B4A;border-color:#E24B4A40;" data-key="${key}" data-del>🗑</button></div>`; card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><div class="pcnum">#${String(p.num).padStart(3,"0")}</div><div style="display:flex;align-items:center;gap:3px;">${badge}${prioCtrl}</div></div><div style="display:flex;align-items:center;gap:5px;margin:1px 0;"><span class="pcli">${p.cliente} · ${p.tipo==="llevar"?"Llevar":"Local"}${p.mesa?" · "+p.mesa:""}</span>${actHtml}</div><div class="pitem">${p.items.map(i=>`${i.qty}× ${i.name}`).join(", ")}</div>${p.obs?`<div style="color:var(--gold);font-size:8px;">📝 ${p.obs}</div>`:""}<div class="tbar"><div class="tbfill" style="width:${pct}%;background:${barCol};"></div></div><div class="ptime">Hace ${mins} min · $${(p.total/1000).toFixed(0)}K</div>`; el.appendChild(card); }); document.querySelectorAll('#cola-d .kbtn.kpre').forEach(btn=>btn.addEventListener('click',()=>cambiarEstado(btn.dataset.key,'preparando'))); document.querySelectorAll('#cola-d .kbtn.klisto').forEach(btn=>btn.addEventListener('click',()=>cambiarEstado(btn.dataset.key,'listo'))); document.querySelectorAll('#cola-d .kbtn.kwa').forEach(btn=>btn.addEventListener('click',()=>enviarWhatsApp(btn.dataset.key))); document.querySelectorAll('#cola-d .priobtn[data-dir]').forEach(btn=>btn.addEventListener('click',()=>moverPrio(btn.dataset.key,parseInt(btn.dataset.dir))));
-  document.querySelectorAll('#cola-d .priobtn[data-del]').forEach(btn=>btn.addEventListener('click',()=>confirmarEliminarPedido(btn.dataset.key))); }
+function renderCola() { if(!suscripcionActiva) return; let el = document.getElementById("cola-d"); if(!el) return; let activos = getActivos(); if(!activos.length) { el.innerHTML="<div style='font-size:10px;color:var(--mu);'>Sin pedidos activos</div>"; return; } el.innerHTML = ""; activos.forEach(([key,p]) => { let mins = Math.floor((Date.now()-p.ts)/60000); let pct = Math.min(100, Math.round(mins/TIEMPO_OBJETIVO*100)); let barCol = pct<60?"#4CAF50":pct<100?"var(--gold)":"#E24B4A"; let card = document.createElement("div"); card.className = "pc"+(p.prioridad?" sprio":""); let estadoColor = p.estado==='nuevo'?'var(--gold)':p.estado==='preparando'?'#F5C842':'#4CAF50'; let badge = `<span style="display:inline-block;width:8px;height:8px;border-radius:8px;background:${estadoColor};margin-right:4px;"></span>`; if(p.prioridad) badge += `<span style="background:var(--gold);color:#000;font-size:7px;padding:0 3px;border-radius:8px;">⭐ PRIO</span>`; let hist = Object.values(pedidos).filter(x=>normalizeWA(x.wa||"")===normalizeWA(p.wa||"") && x.estado==="entregado"); if(hist.length>=VISITAS_RECURRENTE) badge += `<span style="background:#1a2e10;color:#a3d96a;font-size:7px;padding:0 3px;border-radius:8px;margin-left:2px;">Frec</span>`; let actHtml = ""; if(p.estado==="nuevo") actHtml=`<button class="kbtn kpre" data-key="${key}" data-estado="preparando">Preparar</button>`; else if(p.estado==="preparando") actHtml=`<button class="kbtn klisto" data-key="${key}" data-estado="listo">Listo ✓</button>`; else if(p.estado==="listo") actHtml=`<button class="kbtn kwa" data-key="${key}" data-wa>WhatsApp</button>`; let prioCtrl=`<div class="prioctrl"><button class="priobtn" style="color:#E24B4A;border-color:#E24B4A40;" data-key="${key}" data-del>🗑</button></div>`; card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><div class="pcnum">#${String(p.num).padStart(3,"0")}</div><div style="display:flex;align-items:center;gap:3px;">${badge}${prioCtrl}</div></div><div style="display:flex;align-items:center;gap:5px;margin:1px 0;"><span class="pcli">${p.cliente} · ${p.tipo==="llevar"?"Llevar":"Local"}${p.mesa?" · "+p.mesa:""}</span>${actHtml}</div><div class="pitem">${p.items.map(i=>`${i.qty}× ${i.name}`).join(", ")}</div>${p.obs?`<div style="color:var(--gold);font-size:8px;">📝 ${p.obs}</div>`:""}<div class="tbar"><div class="tbfill" style="width:${pct}%;background:${barCol};"></div></div><div class="ptime">Hace ${mins} min · $${(p.total/1000).toFixed(0)}K</div>`; el.appendChild(card); }); document.querySelectorAll('#cola-d .kbtn.kpre').forEach(btn=>btn.addEventListener('click',()=>cambiarEstado(btn.dataset.key,'preparando'))); document.querySelectorAll('#cola-d .kbtn.klisto').forEach(btn=>btn.addEventListener('click',()=>cambiarEstado(btn.dataset.key,'listo'))); document.querySelectorAll('#cola-d .kbtn.kwa').forEach(btn=>btn.addEventListener('click',()=>enviarWhatsApp(btn.dataset.key)));   document.querySelectorAll('#cola-d .priobtn[data-del]').forEach(btn=>btn.addEventListener('click',()=>confirmarEliminarPedido(btn.dataset.key))); }
 function confirmarEliminarPedido(key){
   const p = pedidos[key]; if(!p) return;
   showModal(`
